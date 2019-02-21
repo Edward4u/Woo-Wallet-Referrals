@@ -105,7 +105,7 @@
 					add_filter("ww_referral_get_referrer",       array($this, "get_referrer"), 10, 1);
 					add_action("ww_referral_save_referrer",      array($this, "save_referrer"), 10, 2);
 
-					add_filter("ww_referral_reward_user", function($user, $referrer, $amount){ return $user; });
+					add_filter("ww_referral_reward_user", function($user, $referrer, $amount){ return $user; }, 10, 3);
 
 					add_action("init",              array($this, "save_referrer_cookie"), 9001);
 					add_action("register_new_user", array($this, "save_referrer_on_register"), 9001, 1);
