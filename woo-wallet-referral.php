@@ -266,19 +266,9 @@
 							{
 								$already_rewarded = get_user_meta($user->ID, "ww_referral_referrer_rewarded_for_purchase", true);
 								
-								if(!$already_rewarded)
+								if(!$already_rewarded and !($this->settings["require_purchase_threshhold"] > 0 and wc_get_user_value($user->ID) < $this->settings["require_purchase_threshhold"]))
 								{
-									if($this->settings["require_purchase_threshhold"] > 0)
-									{
-										if(wc_get_user_value($user->ID) >= $this->settings["require_purchase_threshhold"])
-										{
-											woo_wallet()->wallet->credit($referrer->ID, $this->settings["referring_signups_amount"], sanitize_textarea_field(sprintf(__("Referred user %s made a purchase", "woo-wallet-custom-referral"), $user->user_login)));
-										}
-									}
-									else
-									{
-										woo_wallet()->wallet->credit($referrer->ID, $this->settings["referring_signups_amount"], sanitize_textarea_field(sprintf(__("Referred user %s made a purchase", "woo-wallet-custom-referral"), $user->user_login)));
-									}
+									woo_wallet()->wallet->credit($referrer->ID, $this->settings["referring_signups_amount"], sanitize_textarea_field(sprintf(__("Referred user %s made a purchase", "woo-wallet-custom-referral"), $user->user_login)));
 
 									update_user_meta($user->ID, "ww_referral_referrer_rewarded_for_purchase", $order_id);
 								}
