@@ -105,7 +105,7 @@
 					add_filter("ww_referral_get_referrer",       array($this, "get_referrer"), 10, 1);
 					add_action("ww_referral_save_referrer",      array($this, "save_referrer"), 10, 2);
 
-					add_filter("ww_referral_reward_user", function($user, $referrer, $amount){ return $user; }, 10, 3);
+					add_filter("ww_referral_reward_user", function($amount, $user, $referrer){ return $amount; }, 10, 3);
 
 					add_action("init",              array($this, "save_referrer_cookie"), 9001);
 					add_action("register_new_user", array($this, "save_referrer_on_register"), 9001, 1);
@@ -237,9 +237,11 @@
 
 						if($user->ID and $referrer->ID)
 						{
-							if(apply_filters("ww_referral_reward_user", $user, $referrer, $this->settings["referring_signups_amount"]) !== false)
+							$amount = apply_filters("ww_referral_reward_user", $this->settings["referring_signups_amount"], $user, $referrer);
+
+							if($amount !== false)
 							{
-								woo_wallet()->wallet->credit($referrer->ID, $this->settings["referring_signups_amount"], sanitize_textarea_field(sprintf(__("Referred user %s signed up", "woo-wallet-custom-referral"), $user->user_login)));
+								woo_wallet()->wallet->credit($referrer->ID, $amount, sanitize_textarea_field(sprintf(__("Referred user %s signed up", "woo-wallet-custom-referral"), $user->user_login)));
 							}
 						}
 					}
@@ -268,7 +270,12 @@
 								
 								if(!$already_rewarded and !($this->settings["require_purchase_threshhold"] > 0 and wc_get_user_value($user->ID) < $this->settings["require_purchase_threshhold"]))
 								{
-									woo_wallet()->wallet->credit($referrer->ID, $this->settings["referring_signups_amount"], sanitize_textarea_field(sprintf(__("Referred user %s made a purchase", "woo-wallet-custom-referral"), $user->user_login)));
+									$amount = apply_filters("ww_referral_reward_user", $this->settings["referring_signups_amount"], $user, $referrer);
+
+									if($amount !== false)
+									{
+										woo_wallet()->wallet->credit($referrer->ID, $amount, sanitize_textarea_field(sprintf(__("Referred user %s made a purchase", "woo-wallet-custom-referral"), $user->user_login)));
+									}
 
 									update_user_meta($user->ID, "ww_referral_referrer_rewarded_for_purchase", $order_id);
 								}
