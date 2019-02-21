@@ -275,9 +275,9 @@
 									if($amount !== false)
 									{
 										woo_wallet()->wallet->credit($referrer->ID, $amount, sanitize_textarea_field(sprintf(__("Referred user %s made a purchase", "woo-wallet-custom-referral"), $user->user_login)));
+									
+										update_user_meta($user->ID, "ww_referral_referrer_rewarded_for_purchase", $order_id);
 									}
-
-									update_user_meta($user->ID, "ww_referral_referrer_rewarded_for_purchase", $order_id);
 								}
 							}
 						}
